@@ -1,0 +1,41 @@
+#======================================
+# Method returns the sum of 2 integers
+#====================================== 
+START
+#Given 2 integers called number_1 and number_2
+SET result = number_1 + number_2
+PRINT result
+END
+
+#======================================
+# Concatenate Array to String
+#====================================== 
+START
+#Given a collection of strings called strings
+SET result = ""
+SET iterator = 1
+WHILE iterator < length of strings
+  result = result + value within strings collection at space "iterator"
+  iterator = iterator + 1
+PRINT result
+END
+
+#======================================
+# New Array of every other integer
+#====================================== 
+START
+#Given a collection of integers called numbers
+SET new_array = empty array
+SET iterator = 1
+WHILE iterator < length of numbers
+  SET current_number = value within numbers collection at space "iterator"
+  IF iterator divided by 2 has a remainder of 0
+    got to the next iteration
+  ELSE
+    append current_number to the new_array
+
+  iterator = iterator + 1
+
+PRINT new_array
+
+END
