@@ -1,0 +1,10 @@
+en:
+  greeting: "Welcome to Mortgage Calculator! Tell us about your situation."
+  principal: "How much of a loan do you need?"
+  apr: "What is your approved APR?"
+  duration: "How many years will the loan be?"
+  invalid_number: "Not a valid number"
+  monthly_payment: "Your monthly payment will be"
+  total_paid: "The total amount paid will be"
+  interest_paid: "The total interest paid will be"
+  continue: "Do you want to calculate another mortgate? Y/N"
