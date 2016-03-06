@@ -4,19 +4,39 @@ def prompt(message)
   Kernel.puts("=> #{message}")
 end
 
+def rock_wins?(first, second)
+  (first == 'r' && second == 'l') ||
+    (first == 'r' && second == 's')
+end
+
+def paper_wins?(first, second)
+  (first == 'p' && second == 'r') ||
+    (first == 'p' && second == 'S')
+end
+
+def scissors_wins?(first, second)
+  (first == 's' && second == 'p') ||
+    (first == 's' && second == 'l')
+end
+
+def lizard_wins?(first, second)
+  (first == 'l' && second == 'S') ||
+    (first == 'l' && second == 'p')
+end
+
+def spock_wins?(first, second)
+  (first == 'S' && second == 's') ||
+    (first == 'S' && second == 'r')
+end
+
 def win?(first, second)
   first = first.chars.first
   second = second.chars.first
-  (first == 's' && second == 'p') ||
-  (first == 'p' && second == 'r') ||
-  (first == 'r' && second == 'l') ||
-  (first == 'l' && second == 'S') ||
-  (first == 'S' && second == 's') ||
-  (first == 's' && second == 'l') ||
-  (first == 'l' && second == 'p') ||
-  (first == 'p' && second == 'S') ||
-  (first == 'S' && second == 'r') ||
-  (first == 'r' && second == 's')
+  rock_wins?(first, second) ||
+    paper_wins?(first, second) ||
+    scissors_wins?(first, second) ||
+    lizard_wins?(first, second) ||
+    spock_wins?(first, second)
 end
 
 def display_results(player, computer)
@@ -35,14 +55,14 @@ end
 def choice_is_valid?(user_choice)
   VALID_CHOICES.any? do |valid_choice|
     valid_choice == user_choice ||
-    valid_choice.chars.first == user_choice.chars.first
+      valid_choice.chars.first == user_choice.chars.first
   end
 end
 
 loop do # game loop
   player_score = 0
   computer_score = 0
-  loop do # round loop  
+  loop do # round loop
     choice = ''
     loop do # choice loop
       prompt("Choose one: #{VALID_CHOICES.join(', ')}\nFirst to 5 wins!")
