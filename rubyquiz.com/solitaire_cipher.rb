@@ -24,7 +24,7 @@ end
 def encode(message)
   message = filter_characters(message)
   message = group_by_5(message)
-  p message = solitaire_keystream
+  p keystream = solitaire_keystream
   # numericode message
   # numericode keystream
   # combine numericodes, sutract 26 if > 26
@@ -51,7 +51,15 @@ def solitaire_keystream
   deck = initialize_deck
   deck = switch_A_B(deck)
   deck = move_B_2(deck)
+  deck = triple_cut(deck)
+  deck = count_cut(deck)
+  output_letter(deck)
 
+  deck = switch_A_B(deck)
+  deck = move_B_2(deck)
+  deck = triple_cut(deck)
+  deck = count_cut(deck)
+  output_letter(deck)
 end
 
 def switch_A_B(deck)
@@ -69,5 +77,67 @@ def move_B_2(deck)
   deck.insert(end_index, 'B')
 end
 
-message = 'The Robin flies at dawn'
+def triple_cut(deck)
+  index_a = deck.index('A')
+  index_b = deck.index('B')
+  stack1 = cut(deck, 'top', 'A') if index_a < index_b
+  stack1 = cut(deck, 'top', 'B') if index_b < index_a
+  stack2 = cut(deck, 'bottom', 'A') if index_a > index_b
+  stack2 = cut(deck, 'bottom', 'B') if index_b > index_a
+  deck.push(stack1).flatten!
+  deck.unshift(stack2).flatten!
+  deck
+end
+
+def cut(deck, side='top', card)
+  index = deck.index(card)
+  start = (side == 'top')? 0 : -1
+  length = (side == 'top')? index : (deck.length - 1) - index
+  stack = deck.slice!(start, length)
+end
+
+def count_cut(deck, side='bottom')
+   #value = calculate_card_value(deck[-1])
+   value = deck[-1]
+   stack = deck.slice!(0, value)
+   deck.insert(-2, stack).flatten!
+end
+
+def calculate_card_value(card)
+  value = 0
+  value = card if (1..13).include?(card)
+  value = card - 13 if (14..26).include?(card)
+  value = card - 26 if (27..39).include?(card)
+  value = card - 39 if (40..52).include?(card)
+  value
+end
+
+def output_letter(deck)
+  number = deck[0]
+  convert_to_letter(deck[number])
+end
+
+def convert_to_letter(number)
+  number -= 1
+  number = number / 2 if number > 25
+  letters = ('A'..'Z').to_a
+  letters[number]
+end
+
+def convert_to_number(letter)
+
+end
+
+
+message = 'Code in Ruby, live longer!'
 encode(message)
+
+# test_deck = [1,2,3,4,5]
+# #stack1 = cut(test_deck, 'top', 2)
+# stack2 = cut(test_deck, 'bottom', 5)
+
+# #p test_deck.push(stack1).flatten!
+# p test_deck.unshift(stack2).flatten!
+
+#p convert_to_letter(5)
+
