@@ -1,9 +1,9 @@
 class Move
-  VALUES = ['rock', 'paper', 'scissors']
+  VALUES = ['rock', 'paper', 'scissors'].freeze
   def initialize(value)
     @value = value
   end
-  
+
   def to_s
     @value
   end
@@ -11,41 +11,26 @@ class Move
   def scissors?
     @value == 'scissors'
   end
-  
+
   def rock?
     @value == 'rock'
   end
-  
+
   def paper?
     @value == 'paper'
   end
 
   def >(other_move)
-    if rock?
-      return true if other_move.scissors?
-      return false
-    elsif paper?
-      return true if other_move.rock?
-      return false
-    elsif scissors?
-      return true if other_move.paper?
-      return false
-    end
+    (rock? && other_move.scissors?)   ||
+      (paper? && other_move.rock?)    ||
+      (scissors? && other_move.paper?)
   end
 
   def <(other_move)
-    if rock?
-      return true if other_move.paper?
-      return false
-    elsif paper?
-      return true if other_move.scissors?
-      return false
-    elsif scissors?
-      return true if other_move.rock?
-      return false
-    end
+    (rock? && other_move.paper?)       ||
+      (paper? && other_move.scissors?) ||
+      (scissors? && other_move.rock?)
   end
-
 end
 
 class Player
@@ -67,7 +52,7 @@ class Human < Player
     end
     self.name = n
   end
-  
+
   def choose
     choice = nil
     loop do
@@ -84,6 +69,7 @@ class Computer < Player
   def set_name
     self.name = ['R2D2', 'Hal', 'Chappie', 'Sonny', 'Number 5'].sample
   end
+
   def choose
     self.move = Move.new(Move::VALUES.sample)
   end
@@ -105,10 +91,12 @@ class RPSGame
     puts "Thanks for playing Rock, Paper, Scissors. Good bye!"
   end
 
-  def display_winner
+  def display_moves
     puts "#{human.name} chose #{human.move}"
     puts "#{computer.name} chose #{computer.move}"
+  end
 
+  def display_winner
     if human.move > computer.move
       puts "#{human.name} won!"
     elsif human.move < computer.move
@@ -126,8 +114,8 @@ class RPSGame
       break if ['y', 'n'].include? answer.downcase
       puts "Sorry, you must be y or n."
     end
-    return true if answer == 'y'
-    return false
+    return false if answer.casecmp('n') == 0
+    return true if answer.casecmp('y') == 0
   end
 
   def play
@@ -135,6 +123,7 @@ class RPSGame
     loop do
       human.choose
       computer.choose
+      display_moves
       display_winner
       break unless play_again?
     end
