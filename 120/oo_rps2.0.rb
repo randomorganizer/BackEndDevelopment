@@ -1,6 +1,13 @@
 require 'pry'
-class Move
+class Shape
   VALUES = ['rock', 'paper', 'scissors'].freeze
+
+  def self.make_shape(shape_name)
+    return Rock.new if shape_name == 'rock'
+    return Paper.new if shape_name == 'paper'
+    return Scissors.new if shape_name == 'scissors'
+  end
+
   def initialize(value)
     @value = value
   end
@@ -21,21 +28,46 @@ class Move
     @value == 'paper'
   end
 
-  def >(other_move)
-    (rock? && other_move.scissors?)   ||
-      (paper? && other_move.rock?)    ||
-      (scissors? && other_move.paper?)
-  end
+end
 
-  def <(other_move)
-    (rock? && other_move.paper?)       ||
-      (paper? && other_move.scissors?) ||
-      (scissors? && other_move.rock?)
+class Rock < Shape
+  def initialize
+    super('rock')
+  end
+  def >(other_shape)
+    other_shape.class == Scissors
+  end
+  def <(other_shape)
+    other_shape.class == Paper
+  end
+end
+
+class Scissors < Shape
+  def initialize
+    super('scissors')
+  end
+  def >(other_shape)
+    other_shape.class == Paper
+  end
+  def <(other_shape)
+    other_shape.class == Rock
+  end
+end
+
+class Paper < Shape
+  def initialize
+    super('paper')
+  end
+  def >(other_shape)
+    other_shape.class == Rock
+  end
+  def <(other_shape)
+    other_shape.class == Scissors
   end
 end
 
 class Player
-  attr_accessor :move, :name, :score
+  attr_accessor :shape, :name, :score
 
   def initialize
     set_name
@@ -44,10 +76,6 @@ class Player
 end
 
 class Human < Player
-  # def initialize
-  #   super
-  #   @score = 8
-  # end
   def set_name
     n = nil
     loop do
@@ -64,10 +92,10 @@ class Human < Player
     loop do
       puts "Please choose rock, paper, or scissors:"
       choice = gets.chomp
-      break if Move::VALUES.include? choice
+      break if Shape::VALUES.include? choice
       puts 'Sorry, invalid choice.'
     end
-    self.move = Move.new(choice)
+    self.shape = Shape.make_shape(choice)
   end
 end
 
@@ -77,7 +105,7 @@ class Computer < Player
   end
 
   def choose
-    self.move = Move.new(Move::VALUES.sample)
+    self.shape = Shape.make_shape(Shape::VALUES.sample)
   end
 end
 
@@ -99,8 +127,8 @@ class RPSGame
   end
 
   def display_moves
-    puts "#{human.name} chose #{human.move}"
-    puts "#{computer.name} chose #{computer.move}"
+    puts "#{human.name} chose #{human.shape}"
+    puts "#{computer.name} chose #{computer.shape}"
   end
 
   def display_winner
@@ -115,10 +143,10 @@ class RPSGame
   end
 
   def determine_winner
-    if human.move > computer.move
+    if human.shape > computer.shape
       human.score += 1
       "Human"
-    elsif human.move < computer.move
+    elsif human.shape < computer.shape
       computer.score += 1
       "Computer"
     else
