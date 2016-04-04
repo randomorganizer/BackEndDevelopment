@@ -18,18 +18,6 @@ class Shape
     @value
   end
 
-  def scissors?
-    @value == 'scissors'
-  end
-
-  def rock?
-    @value == 'rock'
-  end
-
-  def paper?
-    @value == 'paper'
-  end
-
 end
 
 class Rock < Shape
@@ -103,16 +91,19 @@ class Spock < Shape
 end
 
 class Player
-  attr_accessor :shape, :name, :score, :moves
+  attr_accessor :shape, :name, :score, :moves, :result
 
   def initialize
-    set_name
     @score = 0
     @moves = []
   end
 end
 
 class Human < Player
+  def initialize
+    set_name
+    super
+  end
   def set_name
     n = nil
     loop do
@@ -132,34 +123,102 @@ class Human < Player
       break if Shape::VALUES.include? choice
       puts 'Sorry, invalid choice.'
     end
-    self.moves.push(choice)
     self.shape = Shape.make_shape(choice)
   end
 end
 
 class Computer < Player
-  def set_name
-    self.name = ['R2D2', 'Hal', 'Chappie', 'Sonny', 'Number 5'].sample
+  ROBOTS = ['R2D2', 'Hal', 'Chappie', 'Sonny', 'Number 5']
+
+  def self.initialize_computer
+    name = ROBOTS.sample
+    return R2D2.new if name == 'R2D2'
+    return Hal.new if name == 'Hal'
+    return Chappie.new if name == 'Chappie'
+    return Sonny.new if name == 'Sonny'
+    return Number5.new if name == 'Number 5'
   end
 
   def choose
-    choice = Shape::VALUES.sample
-    self.moves.push(choice)
-    self.shape = Shape.make_shape(choice)
+    choices = Shape::VALUES
+    choices = logical_choices(choices) if RPSGame::AI_LOGIC
+    choices = emotional_choices(choices) if RPSGame::AI_ATTITUDE
+    self.shape = Shape.make_shape(choices.sample)
+  end
+  def logical_choices(choices)
+    Shape::VALUES + choices
+  end
+end
+
+class R2D2 < Computer
+  def initialize
+    @name = 'R2D2'
+    super
+  end
+  def emotional_choices(choices)
+    choices.select { |element| element == 'rock'}
+  end
+end
+
+class Hal < Computer
+  def initialize
+    @name = 'Hal'
+    super
+  end
+  def emotional_choices(choices)
+    choices = choices.select{ |element| element != 'paper'}
+    choices = choices + (['scissors'] * moves.count)
+  end
+end
+
+class Chappie < Computer
+  def initialize
+    @name = 'Chappie'
+    super
+  end
+  def emotional_choices(choices)
+    choices = choices.select { |element| element != 'scissors'}
+  end
+end
+
+class Sonny < Computer
+  def initialize
+    @name = 'Sonny'
+    super
+  end
+  def emotional_choices(choices)
+    if moves.count.odd?
+      ['rock', 'paper']
+    else
+      ['scissors', 'lizard']
+    end
+  end
+end
+
+class Number5 < Computer
+  def initialize
+    @name = 'Number 5'
+    super
+  end
+  def emotional_choices(choices)
+    ['spock']
   end
 end
 
 class RPSGame
+  AI_LOGIC = false
+  AI_ATTITUDE = true
+
   attr_accessor :human, :computer, :winner
 
   def initialize
     @human = Human.new
-    @computer = Computer.new
+    @computer = Computer.initialize_computer
     @winner = nil
   end
 
   def display_welcome_message
-    puts "Welecome to Rock, Paper, Scissors, Liard, Spock!"
+    puts "Welecome to Rock, Paper, Scissors, Lizard, Spock!"
   end
 
   def display_goodbye_message
@@ -172,7 +231,9 @@ class RPSGame
   end
 
   def display_winner
-    case determine_winner
+    round_winner = determine_winner
+    log_history(round_winner)
+    case round_winner
     when 'Human'
       puts "#{human.name} won!"
     when 'Computer'
@@ -186,7 +247,7 @@ class RPSGame
     puts 'Here is what happened'
     moves = human.moves.length
     (0...moves).each do |n|
-      puts "You played #{human.moves[n]} & Computer played #{computer.moves[n]}"
+      puts "You played #{human.moves[n][0]} & Computer played #{computer.moves[n][0]}"
     end
   end
 
@@ -208,11 +269,23 @@ class RPSGame
 
   def declare_game_winner
     if human.score == 10
-      #binding.pry
       self.winner = human.name
     elsif computer.score == 10
       self.winner = 'Computer'
     end 
+  end
+
+  def log_history(round_winner)
+    if round_winner == 'Human'
+      human.moves.push([human.shape.to_s, 'win'])
+      computer.moves.push([computer.shape.to_s, 'lose'])
+    elsif round_winner == 'Computer'
+      human.moves.push([human.shape.to_s, 'lose'])
+      computer.moves.push([computer.shape.to_s, 'win'])
+    else
+      human.moves.push([human.shape.to_s, 'tie'])
+      computer.moves.push([computer.shape.to_s, 'tie'])
+    end
   end
 
   def display_score
