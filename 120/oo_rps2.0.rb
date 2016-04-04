@@ -1,11 +1,13 @@
 require 'pry'
 class Shape
-  VALUES = ['rock', 'paper', 'scissors'].freeze
+  VALUES = ['rock', 'paper', 'scissors', 'lizard', 'spock'].freeze
 
   def self.make_shape(shape_name)
     return Rock.new if shape_name == 'rock'
     return Paper.new if shape_name == 'paper'
     return Scissors.new if shape_name == 'scissors'
+    return Lizard.new if shape_name == 'lizard'
+    return Spock.new if shape_name == 'spock'
   end
 
   def initialize(value)
@@ -35,10 +37,12 @@ class Rock < Shape
     super('rock')
   end
   def >(other_shape)
-    other_shape.class == Scissors
+    other_shape.class == Scissors ||
+    other_shape.class == Lizard
   end
   def <(other_shape)
-    other_shape.class == Paper
+    other_shape.class == Paper ||
+    other_shape.class == Spock
   end
 end
 
@@ -47,10 +51,12 @@ class Scissors < Shape
     super('scissors')
   end
   def >(other_shape)
-    other_shape.class == Paper
+    other_shape.class == Paper ||
+    other_shape.class == Lizard
   end
   def <(other_shape)
-    other_shape.class == Rock
+    other_shape.class == Rock ||
+    other_shape.class == Spock
   end
 end
 
@@ -59,10 +65,40 @@ class Paper < Shape
     super('paper')
   end
   def >(other_shape)
-    other_shape.class == Rock
+    other_shape.class == Rock ||
+    other_shape.class == Spock
   end
   def <(other_shape)
+    other_shape.class == Scissors ||
+    other_shape.class == Lizard
+  end
+end
+
+class Lizard < Shape
+  def initialize
+    super('lizard')
+  end
+  def >(other_shape)
+    other_shape.class == Spock ||
+    other_shape.class == Paper
+  end
+  def <(other_shape)
+    other_shape.class == Rock ||
     other_shape.class == Scissors
+  end
+end
+
+class Spock < Shape
+  def initialize
+    super('spock')
+  end
+  def >(other_shape)
+    other_shape.class == Rock ||
+    other_shape.class == Scissors
+  end
+  def <(other_shape)
+    other_shape.class == Paper ||
+    other_shape.class == Lizard
   end
 end
 
@@ -90,7 +126,7 @@ class Human < Player
   def choose
     choice = nil
     loop do
-      puts "Please choose rock, paper, or scissors:"
+      puts "Please choose rock, paper, scissors, lizard, or spock:"
       choice = gets.chomp
       break if Shape::VALUES.include? choice
       puts 'Sorry, invalid choice.'
@@ -119,11 +155,11 @@ class RPSGame
   end
 
   def display_welcome_message
-    puts "Welecome to Rock, Paper, Scissors!"
+    puts "Welecome to Rock, Paper, Scissors, Liard, Spock!"
   end
 
   def display_goodbye_message
-    puts "Thanks for playing Rock, Paper, Scissors. Good bye!"
+    puts "Thanks for playing Rock, Paper, Scissors, Lizard, Spock. Good bye!"
   end
 
   def display_moves
