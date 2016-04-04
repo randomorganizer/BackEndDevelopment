@@ -103,11 +103,12 @@ class Spock < Shape
 end
 
 class Player
-  attr_accessor :shape, :name, :score
+  attr_accessor :shape, :name, :score, :moves
 
   def initialize
     set_name
     @score = 0
+    @moves = []
   end
 end
 
@@ -131,6 +132,7 @@ class Human < Player
       break if Shape::VALUES.include? choice
       puts 'Sorry, invalid choice.'
     end
+    self.moves.push(choice)
     self.shape = Shape.make_shape(choice)
   end
 end
@@ -141,7 +143,9 @@ class Computer < Player
   end
 
   def choose
-    self.shape = Shape.make_shape(Shape::VALUES.sample)
+    choice = Shape::VALUES.sample
+    self.moves.push(choice)
+    self.shape = Shape.make_shape(choice)
   end
 end
 
@@ -175,6 +179,14 @@ class RPSGame
       puts "#{computer.name} won!"
     when 'Tie'
       puts "It's a tie!"
+    end
+  end
+
+  def display_history
+    puts 'Here is what happened'
+    moves = human.moves.length
+    (0...moves).each do |n|
+      puts "You played #{human.moves[n]} & Computer played #{computer.moves[n]}"
     end
   end
 
@@ -236,6 +248,7 @@ class RPSGame
         display_score
         break if game_winner?
       end
+      display_history
       break unless play_again?
     end
     display_goodbye_message
