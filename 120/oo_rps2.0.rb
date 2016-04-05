@@ -17,20 +17,21 @@ class Shape
   def to_s
     @value
   end
-
 end
 
 class Rock < Shape
   def initialize
     super('rock')
   end
+
   def >(other_shape)
     other_shape.class == Scissors ||
-    other_shape.class == Lizard
+      other_shape.class == Lizard
   end
+
   def <(other_shape)
     other_shape.class == Paper ||
-    other_shape.class == Spock
+      other_shape.class == Spock
   end
 end
 
@@ -38,13 +39,15 @@ class Scissors < Shape
   def initialize
     super('scissors')
   end
+
   def >(other_shape)
     other_shape.class == Paper ||
-    other_shape.class == Lizard
+      other_shape.class == Lizard
   end
+
   def <(other_shape)
     other_shape.class == Rock ||
-    other_shape.class == Spock
+      other_shape.class == Spock
   end
 end
 
@@ -52,13 +55,15 @@ class Paper < Shape
   def initialize
     super('paper')
   end
+
   def >(other_shape)
     other_shape.class == Rock ||
-    other_shape.class == Spock
+      other_shape.class == Spock
   end
+
   def <(other_shape)
     other_shape.class == Scissors ||
-    other_shape.class == Lizard
+      other_shape.class == Lizard
   end
 end
 
@@ -66,13 +71,15 @@ class Lizard < Shape
   def initialize
     super('lizard')
   end
+
   def >(other_shape)
     other_shape.class == Spock ||
-    other_shape.class == Paper
+      other_shape.class == Paper
   end
+
   def <(other_shape)
     other_shape.class == Rock ||
-    other_shape.class == Scissors
+      other_shape.class == Scissors
   end
 end
 
@@ -80,13 +87,15 @@ class Spock < Shape
   def initialize
     super('spock')
   end
+
   def >(other_shape)
     other_shape.class == Rock ||
-    other_shape.class == Scissors
+      other_shape.class == Scissors
   end
+
   def <(other_shape)
     other_shape.class == Paper ||
-    other_shape.class == Lizard
+      other_shape.class == Lizard
   end
 end
 
@@ -104,6 +113,7 @@ class Human < Player
     set_name
     super
   end
+
   def set_name
     n = nil
     loop do
@@ -128,7 +138,7 @@ class Human < Player
 end
 
 class Computer < Player
-  ROBOTS = ['R2D2', 'Hal', 'Chappie', 'Sonny', 'Number 5']
+  ROBOTS = ['R2D2', 'Hal', 'Chappie', 'Sonny', 'Number 5'].freeze
 
   def self.initialize_computer
     name = ROBOTS.sample
@@ -145,8 +155,17 @@ class Computer < Player
     choices = emotional_choices(choices) if RPSGame::AI_ATTITUDE
     self.shape = Shape.make_shape(choices.sample)
   end
+
   def logical_choices(choices)
-    Shape::VALUES + choices
+    return choices if moves.count < 4
+    winners = []
+    Shape::VALUES.each do |shape|
+      sum = moves.count do |move|
+        move[0] == shape && move[1] == 'win'
+      end
+      winners << shape if sum >= 2
+    end
+    choices + (winners * 5)
   end
 end
 
@@ -155,8 +174,9 @@ class R2D2 < Computer
     @name = 'R2D2'
     super
   end
+
   def emotional_choices(choices)
-    choices.select { |element| element == 'rock'}
+    choices.select { |element| element == 'rock' }
   end
 end
 
@@ -165,9 +185,10 @@ class Hal < Computer
     @name = 'Hal'
     super
   end
+
   def emotional_choices(choices)
-    choices = choices.select{ |element| element != 'paper'}
-    choices = choices + (['scissors'] * moves.count)
+    choices = choices.select { |element| element != 'paper' }
+    choices + (['scissors'] * moves.count)
   end
 end
 
@@ -176,8 +197,9 @@ class Chappie < Computer
     @name = 'Chappie'
     super
   end
+
   def emotional_choices(choices)
-    choices = choices.select { |element| element != 'scissors'}
+    choices.select { |element| element != 'scissors' }
   end
 end
 
@@ -186,7 +208,8 @@ class Sonny < Computer
     @name = 'Sonny'
     super
   end
-  def emotional_choices(choices)
+
+  def emotional_choices(*)
     if moves.count.odd?
       ['rock', 'paper']
     else
@@ -200,13 +223,14 @@ class Number5 < Computer
     @name = 'Number 5'
     super
   end
-  def emotional_choices(choices)
+
+  def emotional_choices(*)
     ['spock']
   end
 end
 
 class RPSGame
-  AI_LOGIC = false
+  AI_LOGIC = true
   AI_ATTITUDE = true
 
   attr_accessor :human, :computer, :winner
@@ -272,25 +296,33 @@ class RPSGame
       self.winner = human.name
     elsif computer.score == 10
       self.winner = 'Computer'
-    end 
+    end
   end
 
   def log_history(round_winner)
-    if round_winner == 'Human'
-      human.moves.push([human.shape.to_s, 'win'])
-      computer.moves.push([computer.shape.to_s, 'lose'])
-    elsif round_winner == 'Computer'
-      human.moves.push([human.shape.to_s, 'lose'])
-      computer.moves.push([computer.shape.to_s, 'win'])
-    else
-      human.moves.push([human.shape.to_s, 'tie'])
-      computer.moves.push([computer.shape.to_s, 'tie'])
-    end
+    log_tie if round_winner == 'Tie'
+    log_human_winner if round_winner == 'Human'
+    log_computer_winner if round_winner == 'Computer'
+  end
+
+  def log_tie
+    human.moves.push([human.shape.to_s, 'tie'])
+    computer.moves.push([computer.shape.to_s, 'tie'])
+  end
+
+  def log_human_winner
+    human.moves.push([human.shape.to_s, 'win'])
+    computer.moves.push([computer.shape.to_s, 'lose'])
+  end
+
+  def log_computer_winner
+    human.moves.push([human.shape.to_s, 'lose'])
+    computer.moves.push([computer.shape.to_s, 'win'])
   end
 
   def display_score
     puts "***Player #{human.score} Computer #{computer.score}***"
-    display_game_winner if self.winner != nil
+    display_game_winner if !winner.nil?
   end
 
   def display_game_winner
@@ -306,14 +338,21 @@ class RPSGame
       puts "Sorry, you must be y or n."
     end
     return false if answer.casecmp('n') == 0
-    return true if answer.casecmp('y') == 0
+    if answer.casecmp('y') == 0
+      reset_game
+      return true
+    end
+  end
+
+  def reset_game
+    initialize
   end
 
   def play
     display_welcome_message
     loop do
       loop do
-        human.choose 
+        human.choose
         computer.choose
         display_moves
         display_winner
