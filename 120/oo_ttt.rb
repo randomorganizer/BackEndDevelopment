@@ -1,24 +1,15 @@
-
-=begin
-Tic Tac Toe is played by 2 players. Each take turns marking their symbol on a 9 square grid
-First one to have 3 in a row wins
-
-Player, board, square
-mark play
-=end
-require 'pry'
 class Board
-  WINNING_LINES = [[1,2,3], [4,5,6], [7,8,9]] + # rows
-                  [[1,4,7], [2,5,8], [3,6,9]] + # cols
-                  [[1,5,9], [3,5,7]]            # diagonals
+  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
+                  [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
+                  [[1, 5, 9], [3, 5, 7]] # diagonals
 
   def initialize
     @squares = {}
-    (1..9).each { |key| @squares[key] = Square.new}
+    (1..9).each { |key| @squares[key] = Square.new }
   end
 
   def reset
-    (1..9).each { |key| @squares[key] = Square.new}
+    (1..9).each { |key| @squares[key] = Square.new }
   end
 
   def []=(num, marker)
@@ -47,6 +38,7 @@ class Board
     nil
   end
 
+  # rubocop: disable Metrics/AbcSize
   def draw
     puts "     |     |"
     puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
@@ -60,18 +52,19 @@ class Board
     puts "  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}"
     puts "     |     |"
   end
+  # rubocop:enable Metrics/AbcSize
 
   private
+
   def three_identical_markers?(squares)
     markers = squares.select(&:marked?).collect(&:marker)
     return false if markers.size != 3
     markers.min == markers.max
   end
-
 end
 
 class Square
-  INITIAL_MARKER = " "
+  INITIAL_MARKER = " ".freeze
   attr_accessor :marker
 
   def initialize(marker=INITIAL_MARKER)
@@ -99,17 +92,16 @@ class Player
 end
 
 class TTTGame
-  HUMAN_MARKER = 'X'
-  COMPUTER_MARKER = 'O'
+  HUMAN_MARKER = 'X'.freeze
+  COMPUTER_MARKER = 'O'.freeze
   FIRST_TO_MOVE = HUMAN_MARKER
   attr_reader :board, :human, :computer
   def initialize
     @board = Board.new
     @human = Player.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
-    @current_marker = FIRST_TO_MOVE  
+    @current_marker = FIRST_TO_MOVE
   end
-
 
   def play
     display_welcome_message
