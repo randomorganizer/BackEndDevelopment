@@ -1,7 +1,5 @@
 require 'pry'
-
 module Participant
-
   def initialize
     @cards = []
   end
@@ -10,7 +8,7 @@ module Participant
     @cards.push(deck.deal)
     @cards.push(deck.deal)
   end
-  
+
   def hit(deck)
     card = deck.deal
     @cards.push(card)
@@ -30,7 +28,7 @@ module Participant
   private
 
   def calculate_aces_bonus(base_total)
-    @cards.select { |ace| ace.face == 'Ace'}.each { |card| base_total += 10 if base_total <= 11 }
+    @cards.select { |ace| ace.face == 'Ace' }.each { base_total += 10 if base_total <= 11 }
     base_total
   end
 end
@@ -74,7 +72,7 @@ class Dealer
   end
 
   def hit?
-    self.total < 18
+    total < 18
   end
 end
 
@@ -164,6 +162,10 @@ class Game
   def show_result
     puts @dealer.display_cards
     puts "Player score: #{@player.total} Dealer score: #{@dealer.total}"
+    display_winner
+  end
+
+  def display_winner
     if @player.busted?
       puts 'You busted. Dealer wins'
     elsif @dealer.busted?
@@ -176,12 +178,6 @@ class Game
       puts 'Tie'
     end
   end
-
-  def player_busted_message
-    puts "You busted. Dealer wins"
-  end
-
 end
 
 Game.new.start
-
