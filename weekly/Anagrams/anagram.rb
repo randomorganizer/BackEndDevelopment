@@ -1,19 +1,30 @@
 class Anagram
+
+  attr_reader :word, :letters
+
   def initialize(word)
     @word = word
-    @list = []
-    @anagrams = []
   end
 
   def match(list)
-    @list = list
-    sorted_word = @word.downcase.chars.sort
-    sorted_list = []
-    list.each do |word|
-      next if word.downcase == @word.downcase
-      sorted_list.push(word) if sorted_word == word.downcase.chars.sort
+    list.select { |word_in_list| sortless_anagram? @word, word_in_list }
+  end
+
+  private
+
+  def anagram? word1, word2
+    return false if word1.downcase == word2.downcase
+    word1.downcase.chars.sort == word2.downcase.chars.sort
+  end
+
+  def sortless_anagram? word1, word2
+    return false if word1.downcase == word2.downcase
+    word2_letters = word2.downcase.chars
+    word1.downcase.chars.each do |letter|
+      return false unless word2_letters.include?(letter)
+      word2_letters.delete_at(word2_letters.index(letter))
     end
-    sorted_list
+    word2_letters.length == 0
   end
 
 end
