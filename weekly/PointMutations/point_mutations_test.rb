@@ -44,4 +44,6 @@ class DNATest < Minitest::Test
     assert_equal 4, dna.hamming_distance('AGACATCTTTCAGCCGCCGGATTAGGCAA')
     assert_equal 1, dna.hamming_distance('AGG')
   end
+
+
 end
