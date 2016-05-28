@@ -76,4 +76,10 @@ class WordProblemTest < Minitest::Test
       WordProblem.new('Who is the president of the United States?').answer
     end
   end
+
+  def test_add_then_multiply_with_order_of_operations
+    question = 'What is -3 plus 7 multiplied by -2?'
+    assert_equal(-17, WordProblem.new(question, true).answer)
+  end
+
 end

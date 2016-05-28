@@ -1,6 +1,8 @@
 # WordProblem calculates math problems given in natural language
+require 'pry'
 class WordProblem
-  def initialize(question)
+  def initialize(question, use_order_of_operation=false)
+    @use_ooo = use_order_of_operation
     @question = question
     @values = []
     @operations = []
@@ -9,7 +11,8 @@ class WordProblem
   def answer
     parse_question
     validate_question
-    calculate
+    return calculate_with_ooo if @use_ooo
+    calculate_without_ooo
   end
 
   private
@@ -29,7 +32,21 @@ class WordProblem
     raise ArgumentError, 'Must specify operation' if @operations.count == 0
   end
 
-  def calculate
+  def calculate_with_ooo
+    total = 0
+    while @values.count > 1
+      next_operation_index = @operations.index { |op| op == '*' || op == '/' }
+      next_operation_index ||= 0
+      operation = @operations.slice!(next_operation_index)
+      value1 = @values.slice!(next_operation_index)
+      value2 = @values.slice!(next_operation_index)
+      total = value1.send operation, value2
+      @values.insert(next_operation_index, total)
+    end
+    total
+  end
+
+  def calculate_without_ooo
     total = 0
     while @values.count > 1
       value1 = @values.shift
