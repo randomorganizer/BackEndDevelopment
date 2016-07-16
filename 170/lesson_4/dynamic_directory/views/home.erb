@@ -1,0 +1,10 @@
+<!doctype html>
+<html>
+  <body>
+    <h1>Files<h1>
+    <h3><a href="<%= @sort_link%>"><%= @sort_text %></a></h3>
+    <% @files.each do |file| %>
+      <p><a href="<%= file %>"><%= file %></a></p>
+    <% end %>
+  <body>
+</html>

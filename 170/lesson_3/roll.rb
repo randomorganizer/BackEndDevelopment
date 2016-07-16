@@ -2,6 +2,7 @@ require "socket"
 require "pry"
 
 def parse_params(text)
+  return {:rolls => 1, :sides => 1} if text.nil?
   params = text.split("&")
   rolls = params[0].sub("rolls=","")
   sides = params[1].sub("sides=","")
@@ -15,6 +16,8 @@ loop do
   request_line = client.gets
   puts request_line
 
+  next unless request_line
+
   if (!request_line.include?("favicon"))
     items = request_line.split
 
@@ -22,11 +25,21 @@ loop do
     path = items[1].split("?")[0]
     params = parse_params(items[1].split("?")[1])
 
+    client.puts "HTTP/1.0 200 OK"
+    client.puts "Content-Type: text/html"
+    client.puts
+    client.puts "<html>"
+    client.puts "<body>"
+    client.puts "<pre>"
     client.puts http_method
     client.puts path
+    client.puts "</pre>"
+    client.puts "<h1>Rolls!</h1>"
     params[:rolls].to_i.times do
-      client.puts rand(params[:sides].to_i) + 1
+      client.puts "<p>", rand(params[:sides].to_i) + 1, "</p>"
     end
+    client.puts "</body>"
+    client.puts "</html>"
     client.close
   end
 end

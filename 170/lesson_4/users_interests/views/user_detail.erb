@@ -1,0 +1,7 @@
+<h1><%= params[:name] %></h1>
+<p>Email: <%= @user[:email] %></p>
+<p>Interests: <%= @user[:interests].join(", ") %></p>
+<br />
+<% @other_users.each_key do |key| %>
+  <a href="/users/<%= key %>"><%= key %></a>
+<% end %>
